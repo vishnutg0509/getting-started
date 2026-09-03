@@ -24,7 +24,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                docker build -t ${IMAGE_NAME}:${VERSION} .
+                docker build -t ${student-app}:${4.0} .
                 '''
             }
         }
@@ -48,7 +48,7 @@ pipeline {
                 docker run -d \
                 --name student-dev \
                 -p 3001:80 \
-                ${IMAGE_NAME}:${VERSION}
+                ${student-app}:${1.0}
                 '''
             }
         }
@@ -69,7 +69,7 @@ pipeline {
                 docker run -d \
                 --name student-qa \
                 -p 3002:80 \
-                ${IMAGE_NAME}:${VERSION}
+                ${student-app}:${2.0}
                 '''
             }
         }
@@ -96,7 +96,7 @@ pipeline {
                 docker run -d \
                 --name student-prod \
                 -p 3003:80 \
-                ${IMAGE_NAME}:${VERSION}
+                ${student-app}:${3.0}
                 '''
             }
         }
