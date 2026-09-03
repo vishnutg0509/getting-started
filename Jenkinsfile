@@ -1,47 +1,94 @@
-Pipeline Script:
 pipeline {
-    agent any
+agent any
 
-    environment {
-        IMAGE_NAME = "student-app"
-        VERSION = "1.2"
+```
+environment {
+    IMAGE_NAME = "student-app"
+    VERSION = "1.2"
+}
+
+stages {
+
+    stage('Checkout') {
+        steps {
+            git branch: 'feature/application-change',
+                url: 'https://github.com/vishnutg0509/getting-started.git'
+        }
     }
 
-    stages {
-
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/vishnutg0509/getting-started.git'
-            }
+    stage('Build') {
+        steps {
+            sh '''
+                echo "Building Application"
+            '''
         }
+    }
 
-        stage('Build') {
-            steps {
-                sh 'echo Building Application'
-            }
+    stage('Docker Build') {
+        steps {
+            sh '''
+                echo "Building Docker Image"
+
+                docker build -t ${IMAGE_NAME}:${VERSION} .
+            '''
         }
+    }
 
-        stage('Docker Build') {
-            steps {
-                sh '''
-                docker build -t ${student-app}:${4.0} .
-                '''
-            }
-        }
+    stage('Docker Test') {
+        steps {
+            sh '''
+                echo "Testing Docker Container"
 
-        stage('Docker Test') {
-            steps {
-                sh '''
-                docker run -d --name temp-test -p 4000:80 ${IMAGE_NAME}:${VERSION}
+                docker rm -f temp-test || true
+
+                docker run -d \
+                    --name temp-test \
+                    -p 4000:80 \
+                    ${IMAGE_NAME}:${VERSION}
+
                 sleep 15
-                curl http://localhost:4000
-                docker rm -f temp-test
-                '''
-            }
-        }
 
-        stage('Deploy DEV') {
-            steps {
+                curl http://localhost:4000
+
+                docker rm -f temp-test
+            '''
+        }
+    }
+
+    stage('Deploy DEV') {
+        steps {
+            sh '''
+                echo "Deploying to DEV Environment"
+
+                docker rm -f dev1 || true
+
+                docker run -d \
+                    --name dev1 \
+                    -p 3001:80 \
+                    ${IMAGE_NAME}:${VERSION}
+            '''
+        }
+    }
+}
+
+post {
+
+    success {
+        echo "Pipeline executed successfully"
+    }
+
+    failure {
+        echo "Pipeline failed"
+    }
+
+    always {
+        echo "Pipeline execution completed"
+    }
+}
+```
+
+}
+
                 sh '''
                 docker rm -f student-dev || true
 
