@@ -1,7 +1,6 @@
 pipeline {
 agent any
-
-```
+    
 environment {
     IMAGE_NAME = "student-app"
     VERSION = "1.2"
@@ -76,6 +75,5 @@ post {
         echo "Pipeline execution completed"
     }
 }
-```
 
 }
