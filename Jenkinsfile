@@ -18,17 +18,13 @@ stages {
 
     stage('Build') {
         steps {
-            sh '''
-                echo "Building Application"
-            '''
+            sh 'echo "Building Application"'
         }
     }
 
     stage('Docker Build') {
         steps {
             sh '''
-                echo "Building Docker Image"
-
                 docker build -t ${IMAGE_NAME}:${VERSION} .
             '''
         }
@@ -37,8 +33,6 @@ stages {
     stage('Docker Test') {
         steps {
             sh '''
-                echo "Testing Docker Container"
-
                 docker rm -f temp-test || true
 
                 docker run -d \
@@ -58,8 +52,6 @@ stages {
     stage('Deploy DEV') {
         steps {
             sh '''
-                echo "Deploying to DEV Environment"
-
                 docker rm -f dev1 || true
 
                 docker run -d \
@@ -72,13 +64,12 @@ stages {
 }
 
 post {
-
     success {
-        echo "Pipeline executed successfully"
+        echo "Pipeline SUCCESS"
     }
 
     failure {
-        echo "Pipeline failed"
+        echo "Pipeline FAILED"
     }
 
     always {
@@ -87,73 +78,4 @@ post {
 }
 ```
 
-}
-
-                sh '''
-                docker rm -f student-dev || true
-
-                docker run -d \
-                --name student-dev \
-                -p 3001:80 \
-                ${student-app}:${1.0}
-                '''
-            }
-        }
-
-        stage('Smoke Test') {
-            steps {
-                sh '''
-                curl http://13.236.137.237:3001
-                '''
-            }
-        }
-
-        stage('Deploy QA') {
-            steps {
-                sh '''
-                docker rm -f student-qa || true
-
-                docker run -d \
-                --name student-qa \
-                -p 3002:80 \
-                ${student-app}:${2.0}
-                '''
-            }
-        }
-
-        stage('QA Test') {
-            steps {
-                sh '''
-                curl http://13.236.137.237:3002
-                '''
-            }
-        }
-
-        stage('Manual Approval') {
-            steps {
-                input message: 'Deploy to Production?'
-            }
-        }
-
-        stage('Deploy PROD') {
-            steps {
-                sh '''
-                docker rm -f student-prod || true
-
-                docker run -d \
-                --name student-prod \
-                -p 3003:80 \
-                ${student-app}:${3.0}
-                '''
-            }
-        }
-
-        stage('Production Health Check') {
-            steps {
-                sh '''
-                curl http://13.236.137.237:3003
-                '''
-            }
-        }
-    }
 }
